@@ -1,0 +1,98 @@
+html
+{
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body
+{
+	height: 100%;
+}
+
+h1 
+{
+  padding: 0px;
+  text-align: center;
+}
+
+h3
+{
+	text-align: center;
+	border-bottom: solid;
+	border-width: 1px;
+}
+
+.center
+{
+  justify-content: center;
+}
+
+textarea
+{
+	width: 90%;
+	height: 90%;
+	resize: none;
+}
+
+.main-container 
+{
+	display: flex;
+	flex-direction: column;
+	height: 100%
+}
+
+
+.editors-half
+{
+	display: flex;
+	flex-direction: row;
+	flex-grow: 1;
+}
+
+.footer-half
+{
+	border-top-style: solid;
+}
+
+.editor-pane
+{
+
+	margin-left: 1px;
+	margin-right: 1px;
+	height: 100%;
+	flex-grow: 1;
+
+}
+
+.file-manager-pane
+{
+	max-width: 15%;
+	display: flex;
+	flex-direction: column;
+}
+
+.markdown-editor
+{
+	max-width: 35%;
+}
+
+.HTML-viewer-editor-pane
+{
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.hidden
+{
+display: none;
+}
+
+hr {
+  color: black; 
+  height: 1px; 
+  background-color: black; 
+  border: none; 
+  margin: 10px 0;
+}

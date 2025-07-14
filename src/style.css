@@ -1,0 +1,42 @@
+body {
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: stretch;
+	font-family: 'CMU Serif';
+	min-height: 100%; /* Ensures full viewport height */
+	background-color: #ffffff; /* Light background color */
+}
+
+.post {
+	max-width: 950px; 
+	min-width: 50%;
+	height: 100%;
+	background-color: #ffffff; /* Light blue background for the container */
+	padding: 20px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); /* Optional shadow for depth */
+	overflow: hidden;
+}
+
+.post-text {
+	text-align: left;
+	font-size: 1.2em;
+}
+
+.post-title {
+	display: flex;
+	justify-content: center;
+	font-size: xx-large;
+	font-weight: bold;
+}
+
+.author-container {
+	display: flex;
+	font-weight: bold;
+	justify-content: space-between;
+}
+
+.author, .date {
+	display: inline-block; /* Ensures both author and date are inline elements */
+}
