@@ -7,9 +7,35 @@
 
 <body>
 
-	<div class="title"><h1>RM-CMS</h1></div>
-	<hr>
 
+	<div class="main-container">
+		<div class="title"><h1>RM-CMS</h1></div>
+
+		<div class="editors-half">
+			<div class="file-manager-pane editor-pane">
+				<h3>File Manager</h3>
+				
+				<input id="file-manager-directory-input" type="file" webkitdirectory>
+				<hr>
+				<div id="file-manager-files-buttons"></div> <!-- file-manager-files-buttons --> 
+
+			</div> <!-- file manager pane --> 
+			<div class="markdown-editor editor-pane">
+				<h3>Markdown Editor</h3>
+				<textarea spellcheck=false class="hidden" id="markdown-editor-textarea"></textarea>
+
+
+			</div>
+			<div class="HTML-viewer-editor-pane">
+				<h3>HTML Viewer</h3>	
+				<button class="center hidden" id="preview-html-button">Preview HTML</button>
+			</div>
+
+		</div> <!-- top editors half div --> 
+		<div class="footer-half"> 
+			Footer
+		</div><!-- bottom half --> 
+	</div> <!-- End main-container --> 
 
 
 
