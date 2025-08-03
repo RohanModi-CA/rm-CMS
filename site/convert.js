@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () =>
 	const file_manager_files_buttons_div = document.getElementById("file-manager-files-buttons");
 	const markdown_editor_textarea = document.getElementById("markdown-editor-textarea");
 	const preview_html_button = document.getElementById("preview-html-button");
+	const html_preview_iframe = document.getElementById("html-preview-iframe");
 
 	
 
@@ -46,13 +47,41 @@ document.addEventListener("DOMContentLoaded", () =>
 	}
 
 
-	function launch_markdown_editor(relativepath)
+	function launch_markdown_editor(filetext)
 	{
 		markdown_editor_textarea.classList.remove("hidden");
 		preview_html_button.classList.remove("hidden");
-		markdown_editor_textarea.value = relativepath;
+		markdown_editor_textarea.value = filetext;
 	}
 
+	preview_html_button.addEventListener("click", () => 
+	{
+		const formdata = new FormData();
+		
+		// File expects an array of stuff to put in the file.
+		const markdown_file = new File([markdown_editor_textarea.value], "markdown.md", {type: "text/plain"});
+		formdata.append("mdfile", markdown_file);
+
+		fetch("/upload_markdown", 
+		{
+			method: "POST", 
+			body: formdata
+		})
+		.then(response => response.text())
+		.then(data => 
+		{
+			html_preview_iframe.classList.remove("hidden");
+			const html_preview_iframe_doc = html_preview_iframe.contentDocument || html_preview_iframe.contentWindow.document;
+			console.log("Console says + ", data);
+			html_preview_iframe_doc.open();
+			html_preview_iframe_doc.write(data);
+			html_preview_iframe_doc.close();
+		});
+
+		
+
+
+	});
 
 });
 

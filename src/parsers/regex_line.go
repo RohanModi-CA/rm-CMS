@@ -1,7 +1,6 @@
-package regex_line
+package parsers
 
 import "regexp"
-import "fmt"
 
 func bold_and_italicize(line string) string {
 	var processed_line string
@@ -42,6 +41,29 @@ func hrule(line string) string {
 
 	hrule_regex := regexp.MustCompile(`^[ \t]*---[ \t]*$`)
 	processed_line = hrule_regex.ReplaceAllString(processed_line, "<hr>")
+
+	return processed_line
+}
+
+func images(line string) string {
+	var processed_line string
+	var alt_text string
+	var image_path string
+
+	processed_line = line
+
+	image_regex := regex.MustCompile(`!\[([^\]]+)\]\(([^\)]+)\)`)
+
+	matches := image_regex.FindStringSubmatch(processed_line)
+	if (matches != nil) {
+		alt_text = matches[1]
+		image_path = matches[2]
+
+
+		processed_line = image_regex.ReplaceAllString(processed_line, `<div class="picture"><img alt="$1" loading="lazy" decoding="async"></div>`)
+	}
+	
+
 
 	return processed_line
 }
