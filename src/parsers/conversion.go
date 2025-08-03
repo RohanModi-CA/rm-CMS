@@ -1,10 +1,9 @@
-package main
+package parsers
 
 import "fmt"
 import "os"
 import "bufio"
 import "strings"
-import "regexp"
 
 
 
@@ -30,6 +29,10 @@ func readfile_lines_to_slice(path string) []string {
 
 	return lines
 }
+
+func body_lines_to_slice(body string) []string {
+	return strings.Split(body, "\n")
+}
 // ============ Helper functions ============
 
 
@@ -39,13 +42,16 @@ func create_header() string {
 	var header string 
 	
 	header = `<!DOCTYPE HTML>
-<head>
+	<head>
 	<meta charset="UTF-8">
-	<link rel="stylesheet" href="fonts.css">
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="https://rohanmodi.ca/cms-resources/fonts.css">
+	<link rel="stylesheet" href="https://rohanmodi.ca/cms-resources/post-styles.css">
 	<script src="script.js"></script>
-</head>
-`
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+	<link href="https://rohanmodi.ca/cms-resources/post-prism.css" rel="stylesheet" />
+	<script src="https://rohanmodi.ca/cms-resources/post-prism.js"></script>
+	</head>`
 	return header
 }
 
@@ -59,7 +65,7 @@ type TitleInfo struct {
 	Date string
 }
 
-func create_title_html(title_info TitleInfo) string{
+func create_title_html(title_info TitleInfo) string {
 	var title_html string
 
 	title_html = fmt.Sprintf("<span class='post-title'>%s</span>\n<hr>\n<div class='author-container'><span class='author'>%s</span>\n<span class='date'>%s</span></div><hr>", title_info.Title, title_info.Author, title_info.Date)
@@ -67,6 +73,17 @@ func create_title_html(title_info TitleInfo) string{
 	return title_html
 }
 
+func replace_all_html_special_chars(body string) string {
+	// We replace the ampersand first so we don't break the rest.
+	body = strings.ReplaceAll(body, "&", "&amp;")
+	body = strings.ReplaceAll(body, "\"", "&quot;")
+	body = strings.ReplaceAll(body, "<", "&lt;")
+	body = strings.ReplaceAll(body, ">", "&gt;")
+	body = strings.ReplaceAll(body, "'", "&apos;")
+	// body = strings.ReplaceAll(body, " ", "&nbsp;")
+
+	return body
+}
 
 func process(body string) string {
 	var header string
@@ -84,9 +101,6 @@ func process(body string) string {
 	title_html = create_title_html(title_info)
 
 
-
-	
-
 	// Add the body tags around the body
 	body = "<body> <div class='post'>\n" +  title_html + body + "\n</div></body>\n"
 
@@ -98,29 +112,35 @@ func process(body string) string {
 }
 
 
-func prepreprocess_md_file(md_filepath string) string {
+func prepreprocess_md_file(body string) string {
 	var lines_slice []string
 	var filecontent_str string
 
-	// Read the file
-	lines_slice = readfile_lines_to_slice(md_filepath)
+	// The very first thing we need to do is replace any characters that conflict with html.
+	body = replace_all_html_special_chars(body)
+
+	// First we process the whole thing.
+	body = process_whole(body)
+
+	// Then we split into lines to deal with line parsing.
+	lines_slice = body_lines_to_slice(body)
 
 	// Start iterating over the lines. 
 	for _, line := range lines_slice {
-
-		var div_classes []string
-		var div_classes_str string
+		//var div_classes []string
+		//var div_classes_str string
 		var trimmed_line string
 
 		trimmed_line = strings.TrimSpace(line)
 
 		if (trimmed_line == ""){
 			line = "<br>"
-		} else if (trimmed_line == "---"){
-			line = "<hr>"
+		}else {
+			line = process_line(line)
 		}
 
 
+		/*
 
 		div_classes = append(div_classes, "post-text")
 
@@ -128,6 +148,8 @@ func prepreprocess_md_file(md_filepath string) string {
 		// Wrap everything in a div
 		div_classes_str = strings.Join(div_classes, " ")
 		filecontent_str += fmt.Sprintf("<div class='%s'>", div_classes_str) + "\n\t" + line + "\n</div>\n"
+		*/
+		filecontent_str += line + "\n"
 	}
 
 	return filecontent_str
@@ -135,19 +157,14 @@ func prepreprocess_md_file(md_filepath string) string {
 
 
 
-func main() {
-	var body string
+func MainCall(body string) string {
 	var full_html string
-	var md_filepath string
 
-	md_filepath = "/home/gram/Documents/FileFolder/Obsidian/CMS/1 - Intro.md"
-	body = prepreprocess_md_file(md_filepath)
+	body = prepreprocess_md_file(body)
 
 
 	full_html = process(body)
-	fmt.Println(full_html)
-
-	
+	return full_html
 }
 
 

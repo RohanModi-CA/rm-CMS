@@ -89,10 +89,17 @@ textarea
 display: none;
 }
 
-hr {
+hr 
+{
   color: black; 
   height: 1px; 
   background-color: black; 
   border: none; 
   margin: 10px 0;
+}
+
+#html-preview-iframe
+{
+	margin-bottom: 3em;
+	flex-grow: 1;
 }
