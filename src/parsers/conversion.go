@@ -51,6 +51,7 @@ func create_header() string {
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
 	<link href="https://rohanmodi.ca/cms-resources/post-prism.css" rel="stylesheet" />
 	<script src="https://rohanmodi.ca/cms-resources/post-prism.js"></script>
+	<script>window.IN_DEVELOPMENT=true;</script>
 	</head>`
 	return header
 }

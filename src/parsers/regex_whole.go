@@ -163,6 +163,26 @@ func code_block(whole string) string {
 }
 
 
+func quote_blocks(whole string) string {
+	var processed_whole string
+	
+	processed_whole = whole
+
+	quote_block_regex := regexp.MustCompile(`(?m)(?:^&gt; ?.*\n?)+`)
+	quote_cleaner_regex := regexp.MustCompile(`(?m)^&gt; ?`)
+
+	processed_whole = quote_block_regex.ReplaceAllStringFunc(processed_whole, func (quote_block string) string {
+		content := quote_cleaner_regex.ReplaceAllString(quote_block, "")
+		content = strings.TrimSpace(content)
+		
+		return (fmt.Sprintf("<div class='quote-block'><blockquote>%s</blockquote></div>",content))
+	})
+
+	return processed_whole
+}
+
+
+
 
 func process_whole(whole string) string {
 	var processed_whole string
@@ -171,6 +191,8 @@ func process_whole(whole string) string {
 	processed_whole = whole
 	processed_whole = code_block(processed_whole)
 	processed_whole = foldable_header(processed_whole)
+	processed_whole = quote_blocks(processed_whole)
+
 
 	return processed_whole
 }
