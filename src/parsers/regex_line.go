@@ -1,6 +1,9 @@
 package parsers
 
+import "log"
 import "regexp"
+import "net/url"
+import "fmt"
 
 func bold_and_italicize(line string) string {
 	var processed_line string
@@ -47,30 +50,51 @@ func hrule(line string) string {
 
 func images(line string) string {
 	var processed_line string
-	var alt_text string
 	var image_path string
+	var new_webp_paths [2]string
 
 	processed_line = line
 
-	image_regex := regex.MustCompile(`!\[([^\]]+)\]\(([^\)]+)\)`)
+	image_regex := regexp.MustCompile(`!\[([^\]]*)\]\(([^\)]+)\)`)
 
 	matches := image_regex.FindStringSubmatch(processed_line)
 	if (matches != nil) {
-		alt_text = matches[1]
 		image_path = matches[2]
 
+		decoded_path, err := url.PathUnescape(image_path)
+		if (err != nil) {
+			log.Fatalf("Unable to decode path %v", image_path)
+		}
 
-		processed_line = image_regex.ReplaceAllString(processed_line, `<div class="picture"><img alt="$1" loading="lazy" decoding="async"></div>`)
-	}
+
+		
+		// Now, we're going to attempt to run the image conversion.
+		new_webp_paths = to_webp("uploads/"+decoded_path)
+
+
+		replacement := fmt.Sprintf(`<div class="picture"><img alt="$1" loading="lazy" decoding="async" src="https://static.rohanmodi.ca/images/%s" onerror="%s=null; if(%s){this.src='images/%s';}" ></div>`, new_webp_paths[1], "this.onerror", "window.IN_DEVELOPMENT", new_webp_paths[1])
 	
+		processed_line = image_regex.ReplaceAllString(processed_line, replacement)
+				
+	}
 
+	return processed_line
+}
+
+func hyperlinks(line string) string {
+	var processed_line string
+
+	processed_line = line
+
+	hyperlink_regex := regexp.MustCompile(`(^|[^!])\[(\S.*)\]\((\S.*)\)`)
+	processed_line = hyperlink_regex.ReplaceAllString(processed_line, `$1<a href="$3">$2</a>`)
 
 	return processed_line
 }
 
 
-
 func process_line(line string) string {
+
 	var processed_line string
 
 	processed_line = line
@@ -80,6 +104,9 @@ func process_line(line string) string {
 	processed_line = hrule(processed_line)
 	processed_line = in_line_code(processed_line)
 	processed_line = bold_and_italicize(processed_line)
+	processed_line = images(processed_line)
+	processed_line = hyperlinks(processed_line)
+
 
 	return processed_line
 }

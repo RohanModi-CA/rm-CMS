@@ -15,25 +15,33 @@ document.addEventListener("DOMContentLoaded", () =>
 	});
 
 
+
 	function parse_file_change(files)
 	{
 		// First, we need to find out the name of the directory.
 		let sample_filepath = files[0]["webkitRelativePath"];
 		let directory_name = sample_filepath.split("/")[0];
-
 		let filetree = {directory_name: {}};
+
+		let files_to_upload = [];
 
 		for (let i=0; i<files.length; ++i)
 		{
 			let file = files[i];
 
+			// We will upload any PNG files.
+			if (file.name.substr(-4) === ".png")
+			{
+				files_to_upload.push(file)
+				continue;
+			}
 			// Only add a button for markdown files.
-			if (!(file.name.substr(-3) === ".md"))
+			else if (!(file.name.substr(-3) === ".md"))
 			{
 				continue;
 			}
 
-			console.log(file);
+			// console.log(file);
 			let file_button = document.createElement("button");
 			file_button.textContent = file.webkitRelativePath;
 			file_button.addEventListener("click", async () => 
@@ -43,6 +51,29 @@ document.addEventListener("DOMContentLoaded", () =>
 			});
 
 			file_manager_files_buttons_div.appendChild(file_button);
+		}
+
+		if (files_to_upload.length > 0)
+		{
+			const formdata = new FormData();
+			// Now, let's upload any and all.
+			for (let i=0; i<files_to_upload.length; ++i)
+			{
+				formdata.append("files[]", files_to_upload[i]);
+				// console.log("Attached " + files_to_upload[i].name);
+			}
+
+			fetch("/resources_dump", {
+				method: "POST",
+				body: formdata
+			})
+			.then(response => response.json())
+			.then(data => {
+				console.log("Uploaded the files, ", data);
+			}).catch(error => {
+				console.error(error);
+			})
+		
 		}
 	}
 
@@ -56,6 +87,10 @@ document.addEventListener("DOMContentLoaded", () =>
 
 	preview_html_button.addEventListener("click", () => 
 	{
+		/* We will disable the button until the server replies to avoid spamming the server.*/
+
+		preview_html_button.disabled = true;
+
 		const formdata = new FormData();
 		
 		// File expects an array of stuff to put in the file.
@@ -76,11 +111,10 @@ document.addEventListener("DOMContentLoaded", () =>
 			html_preview_iframe_doc.open();
 			html_preview_iframe_doc.write(data);
 			html_preview_iframe_doc.close();
+
+			// Reenable
+			preview_html_button.disabled=false;
 		});
-
-		
-
-
 	});
 
 });
