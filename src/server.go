@@ -5,11 +5,13 @@ import "io"
 import "path/filepath"
 import "net/http"
 import "os"
+import "log"
 import "cms/parsers"
 import "cms/versioning"
+import "cms/misc"
 
 // Our global conversion state. Uppercase means it is exported throughout main package.
-var GlobalConversionState parsers.ConversionState
+var GlobalConversionState misc.ConversionState
 
 
 func main() {
@@ -20,9 +22,8 @@ func main() {
 	http.HandleFunc("/resources_dump", process_resource_dump)
 	http.HandleFunc("/push-static-images", push_static_images)
 
-	fmt.Println("Started listening on the Port 8080.")
+	fmt.Println("Started listening on the Port 8080.\n")
 	http.ListenAndServe(":8080", nil)
-
 }
 
 
@@ -46,8 +47,8 @@ func process_markdown_file(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	// The +v format specifier prints values as well as struct field names.
-	fmt.Printf("Uploaded file: %+v\n", handler.Filename)
-	fmt.Printf("File size: %+v\n", handler.Size)
+	fmt.Printf("Uploaded file: %+v, ", handler.Filename)
+	fmt.Printf("File size: %+v\n\n", handler.Size)
 
 	filebytes, err := io.ReadAll(file)
 	if err != nil {
@@ -66,11 +67,13 @@ func process_markdown_file(w http.ResponseWriter, r *http.Request) {
 	// And send the content back to the server, alongside a success code.
 	w.WriteHeader(200);
 	fmt.Fprintf(w, html_out)
+	
+	// Print a newline to clean the console.
 }
 
 
 func process_resource_dump(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Call to /resources_dump received.")
+	fmt.Println("Call to /resources_dump received. ")
 
 	// This time, our object will be much larger. We'll allocate 100mb.
 	err := r.ParseMultipartForm(100 << 20)
@@ -102,7 +105,7 @@ func process_resource_dump(w http.ResponseWriter, r *http.Request) {
 
 
 
-	fmt.Printf("Received %d files to upload", len(files))
+	fmt.Printf("Received %d files to upload\n", len(files))
 
 	var uploaded_file_names []string
 
@@ -138,15 +141,37 @@ func process_resource_dump(w http.ResponseWriter, r *http.Request) {
 
 		// Add the filename to our list of successful uploads
 		uploaded_file_names = append(uploaded_file_names, file_header.Filename)
-		w.WriteHeader(200)
-		fmt.Fprintf(w, "Successfully uploaded the files")
 	} // end for loop
+
+	w.WriteHeader(200)
+	fmt.Fprintf(w, "Successfully uploaded the files")
+
+	// Print a newline to clean the console.
+	fmt.Println("")
 }
 
 func push_static_images(w http.ResponseWriter, r *http.Request) {
-
 	versioning.PublishStatics(&GlobalConversionState)
 	w.WriteHeader(204)
+}
+
+func push_html(w http.ResponseWriter, r *http.Request) {
+	// Read the body
+	defer r.Body.Close()
+
+	bodyBytes, err := io.ReadAll(r.Body)
+	if (err != nil) {
+		log.Printf("Error reading body, %s", err)
+		http.Error(w, "Unable to read body", 500)
+		return
+	}
+
+	bodyString := string(bodyBytes)
+	log.Printf("\n\n\n\n\n\nbody %s", bodyString)
+
+	GlobalConversionState.WebsiteRelativePath = bodyString
+
+	w.WriteHeader(200)
 }
 
 

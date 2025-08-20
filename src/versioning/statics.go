@@ -1,12 +1,15 @@
 package versioning
 
 import (
-		"os/exec"
-		"fmt"
+	//	"os/exec"
+	//	"fmt"
+	
 		"time"
 		"os"
 		"path/filepath"
-		"cms/parsers"
+		//"cms/parsers"
+		
+		"cms/misc"
 	   )
 
 
@@ -15,7 +18,12 @@ type file_to_sparse_push struct {
 	sparse_set_path string
 }
 
-func sparse_clone(files_datas []file_to_sparse_push, repository_url string) {
+
+
+
+
+
+func sparse_clone(files_datas []file_to_sparse_push, repository_url string, CS *misc.ConversionState) {
 	/* This function sparse clones a git repository into a /tmp/ directory,
 	   avoiding the downloading of all files except the ones references as
 	   relative_path's in the files_datas struct. The files are copied to the
@@ -34,19 +42,17 @@ func sparse_clone(files_datas []file_to_sparse_push, repository_url string) {
 	var add_files_to_git_list []string
 	var commit_files_list []string
 	var push_files_list []string
-	var error_message string
+	//var error_message string
 
 	local_repo_parent_dir = "/tmp/RM-CMS-TMPDIR-" + string(time.Now().UnixNano()) + "/" 
 
 	// Now we clone our repo within our temporary thing.
 	clone_command_list = []string{"git", "clone", "--filter=blob:none" , "--depth=1", "--no-checkout", repository_url, local_repo_parent_dir}
-	clone_cmd := exec.Command(clone_command_list[0], clone_command_list[1:]...)
-	clone_err := clone_cmd.Run()
-	
-	if (clone_err != nil) {
-		error_message = fmt.Sprintf("Error cloning! %s", clone_err)	
-		panic(error_message)
-	}
+	clone_command_options := misc.ExecOptions{clone_command_list, false, "", false, CS} // Command, Print it, Dir, CS.
+	misc.RunExecCommand(clone_command_options)
+
+
+
 
 	// Make sure we clean up.
 	defer os.RemoveAll(local_repo_parent_dir)
@@ -62,35 +68,21 @@ func sparse_clone(files_datas []file_to_sparse_push, repository_url string) {
 	}
 
 	sparse_checkout_init_list = []string{"git", "sparse-checkout", "init", "--cone"}
-	sparse_checkout_init_cmd := exec.Command(sparse_checkout_init_list[0], sparse_checkout_init_list[1:]...)
-	sparse_checkout_init_cmd.Dir = local_repo_parent_dir
-	sparse_checkout_init_err := sparse_checkout_init_cmd.Run()
+	sparse_checkout_init_options := misc.ExecOptions{sparse_checkout_init_list, false, local_repo_parent_dir, false, CS}
+	misc.RunExecCommand(sparse_checkout_init_options)
 
-	if (sparse_checkout_init_err != nil) {
-		error_message = fmt.Sprintf("Error initing sparse checkout: %s", sparse_checkout_init_err)
-		panic(error_message)
-	}
+
+
 
 	sparse_checkout_set_list = append([]string{"git", "sparse-checkout", "set"}, repo_paths...)
-	sparse_checkout_set_cmd := exec.Command(sparse_checkout_set_list[0], sparse_checkout_set_list[1:]...)
-	sparse_checkout_set_cmd.Dir = local_repo_parent_dir
-	sparse_checkout_set_err := sparse_checkout_set_cmd.Run()
-
-	if (sparse_checkout_set_err != nil) {
-		error_message = fmt.Sprintf("Error setting the sparse checkout: %s", sparse_checkout_set_err)
-		panic(error_message)
-	} 
+	sparse_checkout_set_options := misc.ExecOptions{sparse_checkout_set_list, false, local_repo_parent_dir, false, CS}
+	misc.RunExecCommand(sparse_checkout_set_options)
 
 	// Now we checkout the master branch.
 	checkout_master_list = []string{"git", "checkout", "master"}
-	checkout_master_cmd := exec.Command(checkout_master_list[0], checkout_master_list[1:]...)
-	checkout_master_cmd.Dir = local_repo_parent_dir
-	checkout_master_err := checkout_master_cmd.Run()
+	checkout_master_options := misc.ExecOptions{checkout_master_list, false, local_repo_parent_dir, false, CS}
+	misc.RunExecCommand(checkout_master_options)
 
-	if (checkout_master_err != nil) {
-		error_message = fmt.Sprintf("Error checking out the master branch: %s", checkout_master_err)
-		panic(error_message)
-	}
 	
 
 	/* Now, we need to ensure the directory structures exist so that we can copy our files to where they
@@ -99,13 +91,10 @@ func sparse_clone(files_datas []file_to_sparse_push, repository_url string) {
 	for i:=0; i<len(files_datas); i++ {
 		i_par_dir := local_repo_parent_dir + filepath.Dir(files_datas[i].sparse_set_path)
 		create_subdirectory_list = []string{"mkdir", "-p", i_par_dir}
-		create_subdirectory_cmd := exec.Command(create_subdirectory_list[0], create_subdirectory_list[1:]...)
-		create_subdirectory_err := create_subdirectory_cmd.Run()
+		create_subdirectory_options := misc.ExecOptions{create_subdirectory_list, false, "", false, CS}
+		misc.RunExecCommand(create_subdirectory_options)
 
-		if (create_subdirectory_err != nil) {
-			error_message = fmt.Sprintf("Error creating the subdirectory structure: %s", create_subdirectory_err)
-			panic(error_message)
-		}
+
 	}
 
 
@@ -114,52 +103,32 @@ func sparse_clone(files_datas []file_to_sparse_push, repository_url string) {
 		// Move them
 
 		move_files_to_tmp_list = []string{"cp", files_datas[i].relative_path, local_repo_parent_dir + files_datas[i].sparse_set_path}
-		move_files_to_tmp_cmd := exec.Command(move_files_to_tmp_list[0], move_files_to_tmp_list[1:]...)
-		move_files_to_tmp_err := move_files_to_tmp_cmd.Run()
+		move_files_to_tmp_options := misc.ExecOptions{move_files_to_tmp_list, false, "", false, CS}
+		misc.RunExecCommand(move_files_to_tmp_options)
 
-		if (move_files_to_tmp_err != nil) {
-			error_message = fmt.Sprintf("Error moving the files to the temp directory: %s", move_files_to_tmp_err)
-			panic(error_message)
-		}
 
 		// Add them
 		add_files_to_git_list = []string{"git", "add", files_datas[i].sparse_set_path}
-		add_files_to_git_cmd := exec.Command(add_files_to_git_list[0], add_files_to_git_list[1:]...)	
-		add_files_to_git_cmd.Dir = local_repo_parent_dir
-		add_files_to_git_err := add_files_to_git_cmd.Run()
+		add_files_to_git_options := misc.ExecOptions{add_files_to_git_list, false, local_repo_parent_dir, false, CS}
+		misc.RunExecCommand(add_files_to_git_options)
 
-		if (add_files_to_git_err != nil) {
-			error_message = fmt.Sprintf("Error adding the files to git: %s", add_files_to_git_err)
-			panic(error_message)
-		}
 	}
 
 	// We commit them all and push them all.
 	commit_files_list = []string{"git", "commit", "-am", "File Upload, RM-CMS"}
-	commit_files_cmd := exec.Command(commit_files_list[0], commit_files_list[1:]...)
-	commit_files_cmd.Dir = local_repo_parent_dir
-	commit_files_err := commit_files_cmd.Run()
-
-	if (commit_files_err != nil) {
-		error_message = fmt.Sprintf("Error commiting the files: %s", commit_files_err)
-		panic(error_message)
-	}
+	commit_files_options := misc.ExecOptions{commit_files_list, false, local_repo_parent_dir, true, CS}
+	misc.RunExecCommand(commit_files_options)
 
 	push_files_list = []string{"git", "push", "origin", "master"}
-	push_files_cmd := exec.Command(push_files_list[0], push_files_list[1:]...)
-	push_files_cmd.Dir = local_repo_parent_dir
-	push_files_err := push_files_cmd.Run()
+	push_files_options := misc.ExecOptions{push_files_list, false, local_repo_parent_dir, false, CS}
+	misc.RunExecCommand(push_files_options)
 
-	if (push_files_err != nil) {
-		error_message = fmt.Sprintf("Error pushing the files: %s", push_files_err)
-		panic(error_message)
-	}
 }
 
 
 
-func PublishStatics(cs *parsers.ConversionState) {
-	relative_paths := cs.ImagesRelativePaths
+func PublishStatics(CS *misc.ConversionState) {
+	relative_paths := CS.ImagesRelativePaths
 
 	const repository_url string = "git@github.com:RohanModi-CA/static.rohanmodi.ca.git"
 	var files_datas []file_to_sparse_push
@@ -169,5 +138,5 @@ func PublishStatics(cs *parsers.ConversionState) {
 		files_datas = append(files_datas, i_file_to_sparse_push)
 	}
 
-	sparse_clone(files_datas, repository_url)
+	sparse_clone(files_datas, repository_url, CS)
 }
