@@ -6,14 +6,19 @@ import "path/filepath"
 import "net/http"
 import "os"
 import "cms/parsers"
+import "cms/versioning"
+
+// Our global conversion state. Uppercase means it is exported throughout main package.
+var GlobalConversionState parsers.ConversionState
+
 
 func main() {
-	
 	http.Handle("/", http.FileServer(http.Dir("../site")))
 	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("cms-resources/images"))))
 
 	http.HandleFunc("/upload_markdown", process_markdown_file)
 	http.HandleFunc("/resources_dump", process_resource_dump)
+	http.HandleFunc("/push-static-images", push_static_images)
 
 	fmt.Println("Started listening on the Port 8080.")
 	http.ListenAndServe(":8080", nil)
@@ -52,7 +57,7 @@ func process_markdown_file(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Now, we'll process the file text.
-	html_out := parsers.MainCall(string(filebytes))
+	html_out := parsers.MainCall(string(filebytes), &GlobalConversionState)
 
 	// Let's tell the client we're sending it HTML.
 	w.Header().Set("content-type", "text/html")
@@ -136,8 +141,15 @@ func process_resource_dump(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		fmt.Fprintf(w, "Successfully uploaded the files")
 	} // end for loop
-
-
 }
+
+func push_static_images(w http.ResponseWriter, r *http.Request) {
+
+	versioning.PublishStatics(&GlobalConversionState)
+	w.WriteHeader(204)
+}
+
+
+
 
 

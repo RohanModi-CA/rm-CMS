@@ -48,7 +48,13 @@ func hrule(line string) string {
 	return processed_line
 }
 
-func images(line string) string {
+func images(line string, cs *ConversionState) string {
+	/* Identifies images embedded within the input string, converts them to webP with a hashed filename. Adds them  
+	returns the processed line. Appends to cs.images_relative_paths the paths of the image it finds.
+	// TODO: FIX MULTIPLE IMAGES ON THE SAME LINE.
+	*/
+
+
 	var processed_line string
 	var image_path string
 	var new_webp_paths [2]string
@@ -73,8 +79,9 @@ func images(line string) string {
 
 
 		replacement := fmt.Sprintf(`<div class="picture"><img alt="$1" loading="lazy" decoding="async" src="https://static.rohanmodi.ca/images/%s" onerror="%s=null; if(%s){this.src='images/%s';}" ></div>`, new_webp_paths[1], "this.onerror", "window.IN_DEVELOPMENT", new_webp_paths[1])
-	
 		processed_line = image_regex.ReplaceAllString(processed_line, replacement)
+
+		cs.ImagesRelativePaths = append(cs.ImagesRelativePaths, new_webp_paths[0])
 				
 	}
 
@@ -93,7 +100,7 @@ func hyperlinks(line string) string {
 }
 
 
-func process_line(line string) string {
+func process_line(line string, cs *ConversionState) string {
 
 	var processed_line string
 
@@ -104,7 +111,7 @@ func process_line(line string) string {
 	processed_line = hrule(processed_line)
 	processed_line = in_line_code(processed_line)
 	processed_line = bold_and_italicize(processed_line)
-	processed_line = images(processed_line)
+	processed_line = images(processed_line, cs)
 	processed_line = hyperlinks(processed_line)
 
 

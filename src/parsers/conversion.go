@@ -51,6 +51,29 @@ func create_header() string {
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
 	<link href="https://rohanmodi.ca/cms-resources/post-prism.css" rel="stylesheet" />
 	<script src="https://rohanmodi.ca/cms-resources/post-prism.js"></script>
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" integrity="sha384-5TcZemv2l/9On385z///+d7MSYlvIEw9FuZTIdZ14vJLqWphw7e7ZPuOiCHJcFCP" crossorigin="anonymous">
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js" integrity="sha384-cMkvdD8LoxVzGF/RPUKAcvmm49FQ0oxwDF3BGKtDXcEc+T1b2N+teh/OJfpU0jr6" crossorigin="anonymous"></script>
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			renderMathInElement(document.body, {
+			  // customised options
+			  // • auto-render specific keys, e.g.:
+			  delimiters: [
+				  {left: '$$', right: '$$', display: true},
+				  {left: '$', right: '$', display: false},
+				  {left: '\\(', right: '\\)', display: false},
+				  {left: '\\[', right: '\\]', display: true}
+			  ],
+			  // • rendering keys, e.g.:
+			  throwOnError : false
+			});
+		});
+	</script>
+
+
+
 	<script>window.IN_DEVELOPMENT=true;</script>
 	</head>`
 	return header
@@ -113,7 +136,7 @@ func process(body string) string {
 }
 
 
-func prepreprocess_md_file(body string) string {
+func prepreprocess_md_file(body string, cs *ConversionState) string {
 	var lines_slice []string
 	var filecontent_str string
 
@@ -137,7 +160,7 @@ func prepreprocess_md_file(body string) string {
 		if (trimmed_line == ""){
 			line = "<br>"
 		}else {
-			line = process_line(line)
+			line = process_line(line, cs)
 		}
 
 
@@ -158,10 +181,10 @@ func prepreprocess_md_file(body string) string {
 
 
 
-func MainCall(body string) string {
+func MainCall(body string, cs *ConversionState) string {
 	var full_html string
 
-	body = prepreprocess_md_file(body)
+	body = prepreprocess_md_file(body, cs)
 
 
 	full_html = process(body)

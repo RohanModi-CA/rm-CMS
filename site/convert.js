@@ -5,6 +5,9 @@ document.addEventListener("DOMContentLoaded", () =>
 	const markdown_editor_textarea = document.getElementById("markdown-editor-textarea");
 	const preview_html_button = document.getElementById("preview-html-button");
 	const html_preview_iframe = document.getElementById("html-preview-iframe");
+	const push_statics_button = document.getElementById("push-statics-button")
+	const destination_textarea = document.getElementById("destination-textarea")
+	const push_html_button = document.getElementById("push_html_button")
 
 	
 
@@ -106,15 +109,53 @@ document.addEventListener("DOMContentLoaded", () =>
 		.then(data => 
 		{
 			html_preview_iframe.classList.remove("hidden");
+
 			const html_preview_iframe_doc = html_preview_iframe.contentDocument || html_preview_iframe.contentWindow.document;
 			console.log("Console says + ", data);
 			html_preview_iframe_doc.open();
 			html_preview_iframe_doc.write(data);
 			html_preview_iframe_doc.close();
 
+			push_statics_button.classList.remove("hidden");
+			destination_textarea.classList.remove("hidden");
+			push_html_button.classList.remove("hidden")
+			push_html_button.disabled = true
+
+
 			// Reenable
 			preview_html_button.disabled=false;
 		});
+	});
+
+	push_statics_button.addEventListener("click", async () => 
+	{
+		push_statics_button.disabled = true;
+
+		const response = await fetch("/push-static-images");
+		if (response.status == 204) 
+		{
+			// This is a success
+			alert("Success uploading images.")	
+			push_statics_button.disabled = false;
+		}
+		else
+		{
+			alert(`Error uploading images, reponse: $(response.status)`);
+		}
+
+		push_html_button.disabled = false;
+	});
+
+	push_html_button.addEventListener("click", async () => 
+	{
+		push_html_button.disabled=true
+
+		response = await fetch("/push-html", 
+		{
+			method: "POST",
+			body: destination_textarea.value
+		});
+
 	});
 
 });
