@@ -4,6 +4,7 @@ import "regexp"
 import "unicode"
 import "strings"
 import "fmt"
+import "log"
 
 // ====== helper ======
 
@@ -124,63 +125,6 @@ func find_first_code_block(body [2]string) ([2]string, error) {
 	}
 	return out, nil
 }
-// ====== helper ======
-
-
-
-
-
-func foldable_header(whole string) string {
-	var processed_whole string
-
-	processed_whole = whole
-
-	small_foldable_header_regex := regexp.MustCompile(`(?m)^[ \t]*([^\s#].*$)\r*\n[ \t]*---[ \t]*$`)
-	processed_whole = small_foldable_header_regex.ReplaceAllString(processed_whole, "<div class='small-foldable-header'>$1</div>")
-
-	return processed_whole
-}
-
-func code_block(whole string) string {
-	// We are going to repeatedly call find_first_code_block until it has processed the entire body.
-
-	var whole_pair [2]string
-	var err error
-
-	whole_pair[0] = ""
-	whole_pair[1] = whole
-
-	// Apparently there is no "while" keyword in go
-	for whole_pair[1] != "" {
-		whole_pair, err = find_first_code_block(whole_pair)
-
-		if(err != nil) {
-			panic(err);
-		}
-	}
-
-	return whole_pair[0]
-}
-
-
-func quote_blocks(whole string) string {
-	var processed_whole string
-	
-	processed_whole = whole
-
-	quote_block_regex := regexp.MustCompile(`(?m)(?:^&gt; ?.*\n?)+`)
-	quote_cleaner_regex := regexp.MustCompile(`(?m)^&gt; ?`)
-
-	processed_whole = quote_block_regex.ReplaceAllStringFunc(processed_whole, func (quote_block string) string {
-		content := quote_cleaner_regex.ReplaceAllString(quote_block, "")
-		content = strings.TrimSpace(content)
-		
-		return (fmt.Sprintf("<div class='quote-block'><blockquote>%s</blockquote></div>",content))
-	})
-
-	return processed_whole
-}
-
 
 func parse_table_row(line_rune []rune, columns int) []string{
 	/* This takes one line, and attempts to parse it as though it had columns columns.
@@ -410,6 +354,64 @@ func process_first_table(whole [2]string) [2]string {
 	return out
 }
 
+// ====== helper ======
+
+
+
+
+
+func foldable_header(whole string) string {
+	var processed_whole string
+
+	processed_whole = whole
+
+	small_foldable_header_regex := regexp.MustCompile(`(?m)^[ \t]*([^\s#].*$)\r*\n[ \t]*---[ \t]*$`)
+	processed_whole = small_foldable_header_regex.ReplaceAllString(processed_whole, "<div class='small-foldable-header hidden'>$1</div>")
+
+	return processed_whole
+}
+
+func code_block(whole string) string {
+	// We are going to repeatedly call find_first_code_block until it has processed the entire body.
+
+	var whole_pair [2]string
+	var err error
+
+	whole_pair[0] = ""
+	whole_pair[1] = whole
+
+	// Apparently there is no "while" keyword in go
+	for whole_pair[1] != "" {
+		whole_pair, err = find_first_code_block(whole_pair)
+
+		if(err != nil) {
+			panic(err);
+		}
+	}
+
+	return whole_pair[0]
+}
+
+
+func quote_blocks(whole string) string {
+	var processed_whole string
+	
+	processed_whole = whole
+
+	quote_block_regex := regexp.MustCompile(`(?m)(?:^&gt; ?.*\n?)+`)
+	quote_cleaner_regex := regexp.MustCompile(`(?m)^&gt; ?`)
+
+	processed_whole = quote_block_regex.ReplaceAllStringFunc(processed_whole, func (quote_block string) string {
+		content := quote_cleaner_regex.ReplaceAllString(quote_block, "")
+		content = strings.TrimSpace(content)
+		
+		return (fmt.Sprintf("<div class='quote-block'><blockquote>%s</blockquote></div>",content))
+	})
+
+	return processed_whole
+}
+
+
 func tables(whole string) string {
 	// We are going to repeatedly call process_first_table until it has processed the entire body.
 
@@ -426,6 +428,81 @@ func tables(whole string) string {
 }
 
 
+func postprocess_section_header(whole string) string {
+	/* First we need to find the div. Note that when we created the divs, we did it like this:
+	 processed_whole = small_foldable_header_regex.ReplaceAllString(processed_whole, "<div class='small-foldable-header hidden'>$1</div>")
+	 This means we just have to search for instances of this. We'll create a search that searches for this pattern, adds another div header before,
+	 and then searches for the end of the section. If it is found, we add in the closing div, and if it is not, we put it in at the end, before the
+	 end of the body tag.
+	 */
+
+	 /* We're going to store all starting indices of regexp matches in a list. */
+	 
+	 var matches_indices [][]int
+	 var index_after_which_to_insert_closing int
+	 var index_after_which_to_start_opening int
+	 var current_div_str string
+	 var header_text string
+	 var processed_whole string
+	 var past_length_whole int
+	 var offset_length_whole int
+
+	 processed_whole = whole
+	 small_foldable_header_div_regex := regexp.MustCompile(`<div class='small-foldable-header hidden'>(.*?)</div>`)
+	 matches_indices = small_foldable_header_div_regex.FindAllStringIndex(whole, -1)
+
+	 // Now that we have this list, we're going to loop through, and check whether it goes to the end or not, and handle each case.
+	 // We will first add the closing, since that comes after the opening, so adding the closing will not change the index of the start.
+	 // We'll then calculate the amount of new characters we've added, and then offset all future indices by that amount. Since we are going
+	 // in order, and there is no nesting or anything, this should suffice.
+
+	 for i:=0; i<len(matches_indices); i++ {
+
+		 past_length_whole = len(processed_whole)
+
+		 // First, we'll extract the substring corresponding to this match to extract its header text.
+		 current_div_str = processed_whole[matches_indices[i][0]:matches_indices[i][1]]
+
+		 matches := small_foldable_header_div_regex.FindStringSubmatch(current_div_str)
+		 if (matches == nil || len(matches) == 0) {
+			 // Don't think this is possible but let's just handle this.
+			 log.Fatal("Logic error in processing section header divs")
+		 }
+
+		 header_text = matches[1]
+
+		 index_after_which_to_start_opening = matches_indices[i][1]
+		 
+		 // If it is the last match, that means it goes to the end.
+		 if (i == len(matches_indices) - 1) {
+			 index_after_which_to_insert_closing = len(processed_whole) - 1
+		 } else {
+			 index_after_which_to_insert_closing = matches_indices[i+1][0] - 1
+		 } // else case: there is another foldable_header after this one.
+
+		 // We set the closing </details> in the appropriate place.
+		 processed_whole = processed_whole[:index_after_which_to_insert_closing + 1] + 
+		 		"</details>" + processed_whole[index_after_which_to_insert_closing + 1 :]
+
+		 // Now, we set the opening details and the summary header.
+		 processed_whole = processed_whole[:index_after_which_to_start_opening + 1] + "<details open>\n\t<summary>" + 
+		 					header_text + "</summary>\n" + processed_whole[index_after_which_to_start_opening + 1 :]
+		 
+		
+		// Now, let's see how much we need to offset this by.
+		offset_length_whole = len(processed_whole) - past_length_whole
+
+		for j:=i+1; j<len(matches_indices); j++ {
+			matches_indices[j][0] += offset_length_whole
+			matches_indices[j][1] += offset_length_whole
+		} 
+
+	 } // looping over all matches
+	 
+	 return processed_whole
+}
+
+
 func process_whole(whole string) string {
 	var processed_whole string
 	
@@ -436,6 +513,9 @@ func process_whole(whole string) string {
 	processed_whole = quote_blocks(processed_whole)
 	processed_whole = tables(processed_whole)
 
+
+	// Post Processing
+	processed_whole = postprocess_section_header(processed_whole)
 
 	return processed_whole
 }
