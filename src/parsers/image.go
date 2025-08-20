@@ -1,7 +1,7 @@
 package parsers
 
 import (
-	"fmt"
+	// "fmt"
 	"log"
 	"os"
 	"github.com/davidbyttow/govips/v2/vips"
@@ -15,6 +15,7 @@ var init_once sync.Once
 
 // new function to perform the one-time startup
 func init_vips() {
+	vips.LoggingSettings(nil, vips.LogLevelWarning)
 	vips.Startup(nil)
 }
 
@@ -36,11 +37,11 @@ func to_webp(input_filepath string) [2]string {
 	}
 	defer image.Close()
 
-	fmt.Printf("Successfully loaded image. Dimensions: %d x %d\n", image.Width(), image.Height())
+	// fmt.Printf("Successfully loaded image. Dimensions: %d x %d\n", image.Width(), image.Height())
 
 	params := vips.NewDefaultWEBPExportParams()
 
-	fmt.Printf("Compressing to WebP with Quality=%d...\n", params.Quality)
+	// fmt.Printf("Compressing to WebP with Quality=%d...\n", params.Quality)
 
 	imageBytes, _, err := image.Export(params)
 	if err != nil {
@@ -50,7 +51,7 @@ func to_webp(input_filepath string) [2]string {
 	// Now, let's hash it to get the filename.
 	hash := sha256.Sum256(imageBytes)
 	hashStr := hex.EncodeToString(hash[:])
-	fmt.Printf("Hash: %s\n", hashStr)
+	// fmt.Printf("Hash: %s\n", hashStr)
 
 	output_filepath = "cms-resources/images/" + hashStr + ".webp" 
 	out[0] = output_filepath

@@ -3,6 +3,7 @@ package parsers
 import "fmt"
 import "os"
 import "bufio"
+import "cms/misc"
 import "strings"
 
 
@@ -136,7 +137,7 @@ func process(body string) string {
 }
 
 
-func prepreprocess_md_file(body string, cs *ConversionState) string {
+func prepreprocess_md_file(body string, CS *misc.ConversionState) string {
 	var lines_slice []string
 	var filecontent_str string
 
@@ -160,7 +161,7 @@ func prepreprocess_md_file(body string, cs *ConversionState) string {
 		if (trimmed_line == ""){
 			line = "<br>"
 		}else {
-			line = process_line(line, cs)
+			line = process_line(line, CS)
 		}
 
 
@@ -181,10 +182,10 @@ func prepreprocess_md_file(body string, cs *ConversionState) string {
 
 
 
-func MainCall(body string, cs *ConversionState) string {
+func MainCall(body string, CS *misc.ConversionState) string {
 	var full_html string
 
-	body = prepreprocess_md_file(body, cs)
+	body = prepreprocess_md_file(body, CS)
 
 
 	full_html = process(body)

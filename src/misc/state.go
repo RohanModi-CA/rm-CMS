@@ -1,8 +1,10 @@
-package parsers
+package misc
 
 type ConversionState struct {
 	CurrentlyBusy bool
 	ImagesRelativePaths []string
-	html_file_contents string
+	HtmlFileContents string
+	WebsiteRelativePath string
+	Level LogLevel
 }
 
