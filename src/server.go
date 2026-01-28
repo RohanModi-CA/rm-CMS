@@ -13,19 +13,25 @@ import "cms/misc"
 // Our global conversion state. Uppercase means it is exported throughout main package.
 var GlobalConversionState misc.ConversionState
 
-
 func main() {
+	GlobalConversionState.Level = misc.LogErrors
+
 	http.Handle("/", http.FileServer(http.Dir("../site")))
 	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("cms-resources/images"))))
-
 	http.HandleFunc("/upload_markdown", process_markdown_file)
 	http.HandleFunc("/resources_dump", process_resource_dump)
 	http.HandleFunc("/push-static-images", push_static_images)
+	http.HandleFunc("/push-html", push_html)
 
 	fmt.Println("Started listening on the Port 8080.\n")
-	http.ListenAndServe(":8080", nil)
-}
 
+	versioning.GetWebsiteTree(&GlobalConversionState)
+
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 // This takes the HTTP request that sends the markdown file for processing.
 func process_markdown_file(w http.ResponseWriter, r *http.Request) {
@@ -58,26 +64,27 @@ func process_markdown_file(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Now, we'll process the file text.
-	html_out := parsers.MainCall(string(filebytes), &GlobalConversionState)
+	md_in := string(filebytes)
+	html_out := parsers.MainCall(md_in, &GlobalConversionState)
 
 	// Let's tell the client we're sending it HTML.
 	w.Header().Set("content-type", "text/html")
 
-
 	// And send the content back to the server, alongside a success code.
-	w.WriteHeader(200);
+	w.WriteHeader(200)
 	fmt.Fprintf(w, html_out)
-	
-	// Print a newline to clean the console.
-}
 
+	// We store the output HTML and input md within the state variable.
+	GlobalConversionState.HtmlFileContents = html_out
+	GlobalConversionState.MdFileContents = md_in
+}
 
 func process_resource_dump(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Call to /resources_dump received. ")
 
 	// This time, our object will be much larger. We'll allocate 100mb.
 	err := r.ParseMultipartForm(100 << 20)
-	if (err != nil) {
+	if err != nil {
 		fmt.Printf("Could not parse multipart form: %v", err)
 		http.Error(w, "Error parsing form", http.StatusInternalServerError)
 		return
@@ -90,8 +97,8 @@ func process_resource_dump(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Now, we're going to clear the uploaded files directory to make room for the new files. 
-	
+	// Now, we're going to clear the uploaded files directory to make room for the new files.
+
 	if err := os.RemoveAll("uploads/resources"); err != nil {
 		fmt.Printf("Error: %v\n", err)
 		panic("error")
@@ -101,9 +108,6 @@ func process_resource_dump(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Error recreating directory: %v\n", err)
 		panic("error")
 	}
-
-
-
 
 	fmt.Printf("Received %d files to upload\n", len(files))
 
@@ -123,7 +127,7 @@ func process_resource_dump(w http.ResponseWriter, r *http.Request) {
 		defer file.Close() // Important to close the file
 
 		// Create the destination file
-		destination_path := filepath.Join("uploads","resources", file_header.Filename)
+		destination_path := filepath.Join("uploads", "resources", file_header.Filename)
 		dst, err := os.Create(destination_path)
 		if err != nil {
 			fmt.Printf("Error creating destination file %s: %v", destination_path, err)
@@ -160,21 +164,18 @@ func push_html(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	bodyBytes, err := io.ReadAll(r.Body)
-	if (err != nil) {
+	if err != nil {
 		log.Printf("Error reading body, %s", err)
 		http.Error(w, "Unable to read body", 500)
 		return
 	}
 
 	bodyString := string(bodyBytes)
-	log.Printf("\n\n\n\n\n\nbody %s", bodyString)
+	log.Printf("\n\n\nPublishing on rohanmodi.ca/%s\n\n", bodyString)
 
 	GlobalConversionState.WebsiteRelativePath = bodyString
 
-	w.WriteHeader(200)
+	versioning.PublishWebsite(&GlobalConversionState)
+
+	w.WriteHeader(204)
 }
-
-
-
-
-

@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () =>
 	const html_preview_iframe = document.getElementById("html-preview-iframe");
 	const push_statics_button = document.getElementById("push-statics-button")
 	const destination_input = document.getElementById("destination-input")
+	const destination_label = document.getElementById("destination-label")
 	const push_html_button = document.getElementById("push-html-button")
 
 	
@@ -118,6 +119,7 @@ document.addEventListener("DOMContentLoaded", () =>
 
 			push_statics_button.classList.remove("hidden");
 			destination_input.classList.remove("hidden");
+			destination_label.classList.remove("hidden");
 			push_html_button.classList.remove("hidden")
 			push_html_button.disabled = true
 
@@ -140,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () =>
 		}
 		else
 		{
-			alert(`Error uploading images, reponse: $(response.status)`);
+			alert(`Error uploading images, reponse: ${response.status}`);
 		}
 
 		push_html_button.disabled = false;
@@ -156,8 +158,15 @@ document.addEventListener("DOMContentLoaded", () =>
 			body: destination_input.value
 		});
 
+		if(response.status == 204)
+		{
+			alert("Success!")
+		}
+		else 
+		{
+			alert(`Error uploading website, response: ${response.status}`)
+		}
 	});
-
 });
 
 
