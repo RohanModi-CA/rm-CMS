@@ -6,8 +6,9 @@ document.addEventListener("DOMContentLoaded", () =>
 	const preview_html_button = document.getElementById("preview-html-button");
 	const html_preview_iframe = document.getElementById("html-preview-iframe");
 	const push_statics_button = document.getElementById("push-statics-button")
-	const destination_textarea = document.getElementById("destination-textarea")
-	const push_html_button = document.getElementById("push_html_button")
+	const destination_input = document.getElementById("destination-input")
+	const destination_label = document.getElementById("destination-label")
+	const push_html_button = document.getElementById("push-html-button")
 
 	
 
@@ -117,7 +118,8 @@ document.addEventListener("DOMContentLoaded", () =>
 			html_preview_iframe_doc.close();
 
 			push_statics_button.classList.remove("hidden");
-			destination_textarea.classList.remove("hidden");
+			destination_input.classList.remove("hidden");
+			destination_label.classList.remove("hidden");
 			push_html_button.classList.remove("hidden")
 			push_html_button.disabled = true
 
@@ -140,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () =>
 		}
 		else
 		{
-			alert(`Error uploading images, reponse: $(response.status)`);
+			alert(`Error uploading images, reponse: ${response.status}`);
 		}
 
 		push_html_button.disabled = false;
@@ -153,11 +155,18 @@ document.addEventListener("DOMContentLoaded", () =>
 		response = await fetch("/push-html", 
 		{
 			method: "POST",
-			body: destination_textarea.value
+			body: destination_input.value
 		});
 
+		if(response.status == 204)
+		{
+			alert("Success!")
+		}
+		else 
+		{
+			alert(`Error uploading website, response: ${response.status}`)
+		}
 	});
-
 });
 
 

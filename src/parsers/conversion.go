@@ -1,17 +1,17 @@
 package parsers
 
-import "fmt"
-import "os"
-import "bufio"
-import "cms/misc"
-import "strings"
-
-
+import (
+	"bufio"
+	"cms/misc"
+	"fmt"
+	"os"
+	"strings"
+)
 
 // ============ Helper functions ============
 func readfile_lines_to_slice(path string) []string {
 	f, err := os.Open(path)
-	if (err != nil) {
+	if err != nil {
 		fmt.Println("Error opening file, exiting.")
 		os.Exit(1)
 	}
@@ -22,8 +22,8 @@ func readfile_lines_to_slice(path string) []string {
 	for s.Scan() {
 		lines = append(lines, s.Text())
 	}
-	
-	if (s.Err() != nil) {
+
+	if s.Err() != nil {
 		fmt.Println("Error with the readfile_lines_to_slice, exiting.")
 		os.Exit(1)
 	}
@@ -34,14 +34,12 @@ func readfile_lines_to_slice(path string) []string {
 func body_lines_to_slice(body string) []string {
 	return strings.Split(body, "\n")
 }
+
 // ============ Helper functions ============
 
-
-
-
 func create_header() string {
-	var header string 
-	
+	var header string
+
 	header = `<!DOCTYPE HTML>
 	<head>
 	<meta charset="UTF-8">
@@ -80,14 +78,10 @@ func create_header() string {
 	return header
 }
 
-
-
-
-
 type TitleInfo struct {
-	Title string
+	Title  string
 	Author string
-	Date string
+	Date   string
 }
 
 func create_title_html(title_info TitleInfo) string {
@@ -119,23 +113,19 @@ func process(body string) string {
 	header = create_header()
 
 	title_info = TitleInfo{
-		Title:"Test",
-		Author:"Rohan Modi",
-		Date:"July 13, 2025",
+		Title:  "Test",
+		Author: "Rohan Modi",
+		Date:   "July 13, 2025",
 	}
 	title_html = create_title_html(title_info)
 
-
 	// Add the body tags around the body
-	body = "<body> <div class='post'>\n" +  title_html + body + "\n</div></body>\n"
-
-	
+	body = "<body> <div class='post'>\n" + title_html + body + "\n</div></body>\n"
 
 	full_html = header + body
 
 	return full_html
 }
-
 
 func prepreprocess_md_file(body string, CS *misc.ConversionState) string {
 	var lines_slice []string
@@ -150,7 +140,7 @@ func prepreprocess_md_file(body string, CS *misc.ConversionState) string {
 	// Then we split into lines to deal with line parsing.
 	lines_slice = body_lines_to_slice(body)
 
-	// Start iterating over the lines. 
+	// Start iterating over the lines.
 	for _, line := range lines_slice {
 		//var div_classes []string
 		//var div_classes_str string
@@ -158,21 +148,20 @@ func prepreprocess_md_file(body string, CS *misc.ConversionState) string {
 
 		trimmed_line = strings.TrimSpace(line)
 
-		if (trimmed_line == ""){
+		if trimmed_line == "" {
 			line = "<br>"
-		}else {
+		} else {
 			line = process_line(line, CS)
 		}
 
-
 		/*
 
-		div_classes = append(div_classes, "post-text")
+			div_classes = append(div_classes, "post-text")
 
-		
-		// Wrap everything in a div
-		div_classes_str = strings.Join(div_classes, " ")
-		filecontent_str += fmt.Sprintf("<div class='%s'>", div_classes_str) + "\n\t" + line + "\n</div>\n"
+
+			// Wrap everything in a div
+			div_classes_str = strings.Join(div_classes, " ")
+			filecontent_str += fmt.Sprintf("<div class='%s'>", div_classes_str) + "\n\t" + line + "\n</div>\n"
 		*/
 		filecontent_str += line + "\n"
 	}
@@ -180,17 +169,11 @@ func prepreprocess_md_file(body string, CS *misc.ConversionState) string {
 	return filecontent_str
 }
 
-
-
 func MainCall(body string, CS *misc.ConversionState) string {
 	var full_html string
 
 	body = prepreprocess_md_file(body, CS)
 
-
 	full_html = process(body)
 	return full_html
 }
-
-
-
