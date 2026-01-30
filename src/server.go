@@ -9,12 +9,15 @@ import "log"
 import "cms/parsers"
 import "cms/versioning"
 import "cms/misc"
+import "cms/config"
 
 // Our global conversion state. Uppercase means it is exported throughout main package.
 var GlobalConversionState misc.ConversionState
+var Conf config.Config
 
 func main() {
 	GlobalConversionState.Level = misc.LogErrors
+	Conf = config.ProcessConfig()
 
 	http.Handle("/", http.FileServer(http.Dir("../site")))
 	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("cms-resources/images"))))
@@ -65,7 +68,7 @@ func process_markdown_file(w http.ResponseWriter, r *http.Request) {
 
 	// Now, we'll process the file text.
 	md_in := string(filebytes)
-	html_out := parsers.MainCall(md_in, &GlobalConversionState)
+	html_out := parsers.MainCall(md_in, &GlobalConversionState, &Conf)
 
 	// Let's tell the client we're sending it HTML.
 	w.Header().Set("content-type", "text/html")

@@ -2,6 +2,7 @@ package parsers
 
 import (
 	"bufio"
+	"cms/config"
 	"cms/misc"
 	"fmt"
 	"os"
@@ -37,44 +38,25 @@ func body_lines_to_slice(body string) []string {
 
 // ============ Helper functions ============
 
-func create_header() string {
+func create_header(CS *misc.ConversionState, Conf *config.Config) string {
+	var header_prefix string
+	var header_additions string
+	var header_postfix string
 	var header string
+	var rmCMSVersionMeta string
 
-	header = `<!DOCTYPE HTML>
-	<head>
-	<meta charset="UTF-8">
-	<link rel="stylesheet" href="https://rohanmodi.ca/cms-resources/fonts.css">
-	<link rel="stylesheet" href="https://rohanmodi.ca/cms-resources/post-styles.css">
-	<script src="script.js"></script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
-	<link href="https://rohanmodi.ca/cms-resources/post-prism.css" rel="stylesheet" />
-	<script src="https://rohanmodi.ca/cms-resources/post-prism.js"></script>
+	rmCMSVersionMeta = fmt.Sprintf(`<meta name="RM_CMS_VERSION" content="%s">`, misc.GetRMCMSVersion(CS))
 
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" integrity="sha384-5TcZemv2l/9On385z///+d7MSYlvIEw9FuZTIdZ14vJLqWphw7e7ZPuOiCHJcFCP" crossorigin="anonymous">
-	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js" integrity="sha384-cMkvdD8LoxVzGF/RPUKAcvmm49FQ0oxwDF3BGKtDXcEc+T1b2N+teh/OJfpU0jr6" crossorigin="anonymous"></script>
-	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
-	<script>
-		document.addEventListener("DOMContentLoaded", function() {
-			renderMathInElement(document.body, {
-			  // customised options
-			  // • auto-render specific keys, e.g.:
-			  delimiters: [
-				  {left: '$$', right: '$$', display: true},
-				  {left: '$', right: '$', display: false},
-				  {left: '\\(', right: '\\)', display: false},
-				  {left: '\\[', right: '\\]', display: true}
-			  ],
-			  // • rendering keys, e.g.:
-			  throwOnError : false
-			});
-		});
-	</script>
+	header_prefix = ` <!DOCTYPE HTML>
+	<head>`
 
+	header_additions = `<script>window.IN_DEVELOPMENT=true;</script>`
+	header_additions += rmCMSVersionMeta
 
+	header_postfix = `</head>`
 
-	<script>window.IN_DEVELOPMENT=true;</script>
-	</head>`
+	header = header_prefix + Conf.HeadContents + header_additions + header_postfix
+
 	return header
 }
 
@@ -104,13 +86,13 @@ func replace_all_html_special_chars(body string) string {
 	return body
 }
 
-func process(body string) string {
+func process(body string, CS *misc.ConversionState, Conf *config.Config) string {
 	var header string
 	var full_html string
 	var title_info TitleInfo
 	var title_html string
 
-	header = create_header()
+	header = create_header(CS, Conf)
 
 	title_info = TitleInfo{
 		Title:  "Test",
@@ -169,11 +151,11 @@ func prepreprocess_md_file(body string, CS *misc.ConversionState) string {
 	return filecontent_str
 }
 
-func MainCall(body string, CS *misc.ConversionState) string {
+func MainCall(body string, CS *misc.ConversionState, Conf *config.Config) string {
 	var full_html string
 
 	body = prepreprocess_md_file(body, CS)
 
-	full_html = process(body)
+	full_html = process(body, CS, Conf)
 	return full_html
 }

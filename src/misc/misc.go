@@ -126,3 +126,16 @@ func ErrorHandlePanic(err error) {
 		panic(err)
 	}
 }
+
+func GetRMCMSVersion(cs *ConversionState) string {
+	commandlist := []string{"git", "describe", "--tags", "--always"}
+	eo := ExecOptions{
+		CommandList: commandlist,
+		LogCommand:  false,
+		Dir:         "",
+		DontPanic:   false,
+		CS:          cs,
+	}
+	version := RunExecCommandOut(eo)
+	return strings.TrimSpace(version)
+}
