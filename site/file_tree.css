@@ -1,0 +1,20 @@
+.directory_name 
+{
+	margin-left: 1em;
+  font-weight: bold;
+}
+
+.directory_summary_name
+{
+
+}
+
+.file_name
+{
+  font-weight: normal;
+}
+
+.hidden
+{
+	display: none;
+}
