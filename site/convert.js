@@ -1,3 +1,6 @@
+import {destination_selector_on_load} from "./destination_selector.js"
+
+
 document.addEventListener("DOMContentLoaded", () =>
 {
 	const file_manager_directory_input = document.getElementById("file-manager-directory-input");
@@ -9,7 +12,9 @@ document.addEventListener("DOMContentLoaded", () =>
 	const destination_input = document.getElementById("destination-input")
 	const destination_label = document.getElementById("destination-label")
 	const push_html_button = document.getElementById("push-html-button")
-
+	const select_destination_button = document.getElementById("select-destination-button")
+	const select_destination_dialog = document.getElementById("select-destination-dialog");
+	const destination_selector = document.getElementById("destination-selector");
 	
 
 	file_manager_directory_input.addEventListener("change", () => 
@@ -118,6 +123,7 @@ document.addEventListener("DOMContentLoaded", () =>
 			html_preview_iframe_doc.close();
 
 			push_statics_button.classList.remove("hidden");
+			select_destination_button.classList.remove("hidden")
 			destination_input.classList.remove("hidden");
 			destination_label.classList.remove("hidden");
 			push_html_button.classList.remove("hidden")
@@ -167,6 +173,31 @@ document.addEventListener("DOMContentLoaded", () =>
 			alert(`Error uploading website, response: ${response.status}`)
 		}
 	});
+
+	select_destination_button.addEventListener("click", ()=>
+	{
+		select_destination_dialog.showModal();
+		destination_selector_on_load(destination_selector, handle_return_from_destination_selector);
+	});
+
+	select_destination_dialog.addEventListener("close", ()=>
+	{
+		if (select_destination_dialog.returnValue == "default")
+		{
+			return
+		}
+
+		destination_input.value = select_destination_dialog.returnValue
+	});
+
+
+	function handle_return_from_destination_selector(selected_filename)
+	{
+		// I think we should be able to assume the modal dialog is open. 
+		// Makes no sense otherwise.
+
+		select_destination_dialog.close(selected_filename)
+	}
 });
 
 
