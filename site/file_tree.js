@@ -1,8 +1,8 @@
 /**
  * @param {HTMLDivElement} parent_node - This is generally the "directory_name" div of where you want to place the new dir. Unless its the first directory.
  * @param {string} dir_name - The name of the directory to create. Will not be checked for validity.
- * @param {Boolean} open - Whether the details of this directory should be open by default.
- * @returns {{directory_details: HTMLDetailsElement, directory_name_div: HTMLDivElement}}
+ * @param {boolean} open - Whether the details of this directory should be open by default.
+ * @returns {{directory_details: HTMLDetailsElement, directory_name_div: HTMLDivElement}} - The directory_details for the new div, as well as the new directory_name_div, where you would put nested files, etc.
  */
 export function create_new_dir_div(parent_node, dir_name, open=false)
 {
@@ -66,7 +66,7 @@ export async function initialize_file_tree()
 			let dir_contents = entry["contents"]
 			let dir_name = entry["name"]
 
-			/** @type {Boolean} */ 
+			/** @type {boolean} */ 
 			let first_entry = (count == 0)
 
 			let {directory_name_div} = create_new_dir_div(root_div, dir_name, first_entry)

@@ -16,10 +16,6 @@ document.addEventListener("DOMContentLoaded", () =>
 	const select_destination_dialog = document.getElementById("select-destination-dialog");
 	const destination_selector = document.getElementById("destination-selector");
 	
-	
-	
-	
-	
 
 	file_manager_directory_input.addEventListener("change", () => 
 	{
@@ -202,9 +198,6 @@ document.addEventListener("DOMContentLoaded", () =>
 
 		select_destination_dialog.close(selected_filename)
 	}
-
-
-
 });
 
 
