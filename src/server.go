@@ -55,6 +55,15 @@ func process_markdown_file(w http.ResponseWriter, r *http.Request) {
 
 	defer file.Close()
 
+	pageTitle := r.FormValue("page_title")
+	pageDate := r.FormValue("page_date")
+
+	titleInfo := parsers.TitleInfo{
+		Title:  pageTitle,
+		Author: Conf.DefaultAuthor,
+		Date:   pageDate,
+	}
+
 	// The +v format specifier prints values as well as struct field names.
 	fmt.Printf("Uploaded file: %+v, ", handler.Filename)
 	fmt.Printf("File size: %+v\n\n", handler.Size)
@@ -68,7 +77,7 @@ func process_markdown_file(w http.ResponseWriter, r *http.Request) {
 
 	// Now, we'll process the file text.
 	md_in := string(filebytes)
-	html_out := parsers.MainCall(md_in, &GlobalConversionState, &Conf)
+	html_out := parsers.MainCall(md_in, &GlobalConversionState, &Conf, titleInfo)
 
 	// Let's tell the client we're sending it HTML.
 	w.Header().Set("content-type", "text/html")

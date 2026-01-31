@@ -86,20 +86,14 @@ func replace_all_html_special_chars(body string) string {
 	return body
 }
 
-func process(body string, CS *misc.ConversionState, Conf *config.Config) string {
+func process(body string, CS *misc.ConversionState, Conf *config.Config, titleInfo TitleInfo) string {
 	var header string
 	var full_html string
-	var title_info TitleInfo
 	var title_html string
 
 	header = create_header(CS, Conf)
 
-	title_info = TitleInfo{
-		Title:  "Test",
-		Author: "Rohan Modi",
-		Date:   "July 13, 2025",
-	}
-	title_html = create_title_html(title_info)
+	title_html = create_title_html(titleInfo)
 
 	// Add the body tags around the body
 	body = "<body> <div class='post'>\n" + title_html + body + "\n</div></body>\n"
@@ -151,11 +145,11 @@ func prepreprocess_md_file(body string, CS *misc.ConversionState) string {
 	return filecontent_str
 }
 
-func MainCall(body string, CS *misc.ConversionState, Conf *config.Config) string {
+func MainCall(body string, CS *misc.ConversionState, Conf *config.Config, titleInfo TitleInfo) string {
 	var full_html string
 
 	body = prepreprocess_md_file(body, CS)
 
-	full_html = process(body, CS, Conf)
+	full_html = process(body, CS, Conf, titleInfo)
 	return full_html
 }

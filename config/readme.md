@@ -6,3 +6,5 @@ We slowly are trying to make this configurable. We suggest putting any files you
 
 - HeaderPath: The path to a HTML file that contains whatever you want to put in the `<head></head>`. **Do not** include `<head></head>`, or `<!DOCTYPE HTML>`, etc. 
 
+- DefaultAuthor: The name of the author that pages will be attributed to.
+
