@@ -15,6 +15,13 @@ document.addEventListener("DOMContentLoaded", () =>
 	const select_destination_button = document.getElementById("select-destination-button")
 	const select_destination_dialog = document.getElementById("select-destination-dialog");
 	const destination_selector = document.getElementById("destination-selector");
+	const page_title_input = document.getElementById("page-title-input");
+	const page_date_input = document.getElementById("page-date-input");
+	const name_and_date_div = document.getElementById("name-and-date-div");
+	
+	
+	
+	
 	
 
 	file_manager_directory_input.addEventListener("change", () => 
@@ -57,6 +64,7 @@ document.addEventListener("DOMContentLoaded", () =>
 			{
 				let filetext = await file.text();
 				launch_markdown_editor(filetext);
+				setup_page_title_date(file.name)
 			});
 
 			file_manager_files_buttons_div.appendChild(file_button);
@@ -94,6 +102,20 @@ document.addEventListener("DOMContentLoaded", () =>
 		markdown_editor_textarea.value = filetext;
 	}
 
+	/**
+	* @param {string} filename - The default filename to choose
+	*/ 
+	function setup_page_title_date(filename)
+	{
+		name_and_date_div.classList.remove("hidden")
+
+		// TODO: better than this:
+		filename = filename.slice(0, -3);
+		page_title_input.value = filename
+		page_date_input.valueAsDate = new Date();
+	}
+
+
 	preview_html_button.addEventListener("click", () => 
 	{
 		/* We will disable the button until the server replies to avoid spamming the server.*/
@@ -105,6 +127,8 @@ document.addEventListener("DOMContentLoaded", () =>
 		// File expects an array of stuff to put in the file.
 		const markdown_file = new File([markdown_editor_textarea.value], "markdown.md", {type: "text/plain"});
 		formdata.append("mdfile", markdown_file);
+		formdata.append("page_title", page_title_input.value)
+		formdata.append("page_date", page_date_input.value)
 
 		fetch("/upload_markdown", 
 		{
@@ -198,6 +222,10 @@ document.addEventListener("DOMContentLoaded", () =>
 
 		select_destination_dialog.close(selected_filename)
 	}
+
+
+
+
 });
 
 

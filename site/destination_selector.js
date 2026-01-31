@@ -88,8 +88,8 @@ function add_new_dir_button_on_click(event)
 	function confirm_new_dir_name_button_on_click(event) 
 	{
 		// We will convert the  TODO
-		create_new_dir_div(directory_name, new_dir_name_input.value, true)
-		const new_dir_summary = directory_name.querySelector("summary")
+		let { directory_details: new_dir_details } = create_new_dir_div(directory_name, new_dir_name_input.value, true)
+		const new_dir_summary = new_dir_details.querySelector("summary")
 		add_new_dir_and_class_button(new_dir_summary)
 		new_dir_name_div.classList.add("hidden")
 	}

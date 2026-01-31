@@ -7,11 +7,13 @@ import (
 )
 
 type configTOML struct {
-	HeaderPath string
+	HeaderPath    string
+	DefaultAuthor string
 }
 
 type Config struct {
-	HeadContents string
+	HeadContents  string
+	DefaultAuthor string
 }
 
 func path_from_user(inp_path string) string {
@@ -43,6 +45,7 @@ func ProcessConfig() Config {
 	misc.ErrorHandlePanic(err_header_read)
 
 	conf.HeadContents = string(header_bytes)
+	conf.DefaultAuthor = confTOML.DefaultAuthor
 
 	return conf
 }
