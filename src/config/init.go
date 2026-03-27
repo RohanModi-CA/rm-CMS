@@ -4,6 +4,7 @@ import (
 	"cms/misc"
 	"github.com/BurntSushi/toml"
 	"os"
+	"path/filepath"
 )
 
 type configTOML struct {
@@ -18,8 +19,9 @@ type Config struct {
 
 func path_from_user(inp_path string) string {
 	// If a relative path, prepends the relative path to user.
+	// filepath.IsAbs handles both Unix (/…) and Windows (\… or C:\…).
 
-	if len(inp_path) > 0 && inp_path[0] != '\\' {
+	if !filepath.IsAbs(inp_path) {
 		inp_path = "../config/user/" + inp_path
 	}
 	return inp_path
