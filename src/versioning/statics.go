@@ -4,6 +4,7 @@ import (
 	//	"os/exec"
 	//	"fmt"
 
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -39,7 +40,7 @@ func sparse_clone(files_datas []file_to_sparse_push, repository_url string, CS *
 	var push_files_list []string
 	//var error_message string
 
-	local_repo_parent_dir = "/tmp/RM-CMS-TMPDIR-" + string(time.Now().UnixNano()) + "/"
+	local_repo_parent_dir = "/tmp/RM-CMS-TMPDIR-" + fmt.Sprintf("%d", time.Now().UnixNano()) + "/"
 
 	// Now we clone our repo within our temporary thing.
 	clone_command_list = []string{"git", "clone", "--filter=blob:none", "--depth=1", "--no-checkout", repository_url, local_repo_parent_dir}

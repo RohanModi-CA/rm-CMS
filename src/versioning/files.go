@@ -2,6 +2,7 @@ package versioning
 
 import (
 	"cms/misc"
+	"fmt"
 	"os"
 	"time"
 )
@@ -19,7 +20,7 @@ func GetWebsiteTree(CS *misc.ConversionState) {
 	var lsTreeCommandList []string
 	var tree_command_list []string
 
-	localRepoParentDir = "/tmp/RM-CMS-TMPDIR-" + string(time.Now().UnixNano()) + "/"
+	localRepoParentDir = "/tmp/RM-CMS-TMPDIR-" + fmt.Sprintf("%d", time.Now().UnixNano()) + "/"
 	cloneCommandList = []string{"git", "clone", "--filter=blob:none", "--no-checkout", repositoryURL, localRepoParentDir}
 	cloneCommandOptions := misc.ExecOptions{
 		CommandList: cloneCommandList,
