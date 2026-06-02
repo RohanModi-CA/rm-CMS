@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RM-CMS | Login</title>
+    <link rel="stylesheet" href="convert.css">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            border: 1px solid black;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .tab-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        input {
+            padding: 8px;
+            font-family: monospace;
+        }
+        button {
+            padding: 10px;
+            cursor: pointer;
+            font-family: monospace;
+        }
+        #signup-json-output {
+            width: 100%;
+            height: 150px;
+            font-size: 10px;
+            margin-top: 10px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/hash-wasm@4.11.0/dist/argon2.umd.min.js"></script>
+</head>
+<body>
+    <div class="main-container">
+        <div class="title"><h1>RM-CMS</h1></div>
+        
+        <div class="login-container">
+            <div class="tab-buttons">
+                <button id="show-login">Login</button>
+                <button id="show-signup">Sign up</button>
+            </div>
+
+            <div id="login-form">
+                <h3>Login</h3>
+                <div id="auth-status" style="text-align:center; margin-bottom:10px; font-weight:bold;">Status: Checking...</div>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <input type="text" id="login-username" placeholder="Username">
+                    <input type="password" id="login-password" placeholder="Password">
+                    <button id="login-button">Unlock</button>
+                    <button id="logout-button" class="hidden" style="background-color: #ffcccc;">Logout</button>
+                </div>
+            </div>
+
+            <div id="signup-form" class="hidden">
+                <h3>Sign up</h3>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <input type="text" id="signup-username" placeholder="Username">
+                    <input type="password" id="signup-password" placeholder="Password">
+                    <button id="signup-button">Generate Keys</button>
+                    <p style="font-size: 12px;">Send this JSON to the administrator:</p>
+                    <textarea id="signup-json-output" readonly placeholder="JSON will appear here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-half" style="text-align: center; padding: 10px;">
+            Secure Client-Side Authentication
+        </div>
+    </div>
+    <script type="module" src="login.js"></script>
+</body>
+</html>
