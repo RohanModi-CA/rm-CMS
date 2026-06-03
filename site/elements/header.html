@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RM-CMS | Header Demo</title>
+    <link rel="stylesheet" href="../convert.css">
+</head>
+<body>
+    <div id="header-slot"></div>
+
+    <div style="padding: 16px; font-family: monospace;">
+        Header demo page.
+    </div>
+
+    <script type="module">
+        import { mountHeader } from "./header.js";
+        mountHeader(document.getElementById("header-slot"));
+    </script>
+</body>
+</html>

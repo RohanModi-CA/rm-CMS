@@ -10,7 +10,8 @@
 1. **Frontend:** Vanilla HTML/JS. Logic-heavy on the client.
 2. **Parser (Local Go):** A simple utility to convert Markdown to HTML and optimize images.
 3. **Storage:** Git-based. Static files only.
-4. **Auth:** To be implemented using client-side encryption.
+4. **Auth:** Client-side RSA encryption for login and secrets.
+5. **Elements:** Small reusable UI fragments mounted into pages.
 
 ## Rules
 - No big architectural changes without a full rethink.
