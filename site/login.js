@@ -12,24 +12,39 @@ async function deriveAESKey(password, salt) {
 function updateUI() {
     const authStatus = document.getElementById("auth-status");
     const logoutButton = document.getElementById("logout-button");
-    const loginFields = document.getElementById("login-form-fields");
+    const loginForm = document.getElementById("login-form");
+    const signupForm = document.getElementById("signup-form");
 
     if (rmcmsAuth.isAuthenticated()) {
         authStatus.textContent = "Status: Authenticated";
         authStatus.style.color = "green";
         logoutButton.classList.remove("hidden");
-        loginFields.classList.add("hidden");
     } else {
         authStatus.textContent = "Status: Not Authenticated";
         authStatus.style.color = "red";
         logoutButton.classList.add("hidden");
-        loginFields.classList.remove("hidden");
     }
+
+    loginForm.classList.remove("hidden");
+    signupForm.classList.add("hidden");
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
     await rmcmsAuth.tryRestoreSession();
     updateUI();
+
+    const loginForm = document.getElementById("login-form");
+    const signupForm = document.getElementById("signup-form");
+
+    document.getElementById("show-login").addEventListener("click", () => {
+        loginForm.classList.remove("hidden");
+        signupForm.classList.add("hidden");
+    });
+
+    document.getElementById("show-signup").addEventListener("click", () => {
+        loginForm.classList.add("hidden");
+        signupForm.classList.remove("hidden");
+    });
 
     document.getElementById("logout-button").addEventListener("click", async () => {
         await rmcmsAuth.logout();

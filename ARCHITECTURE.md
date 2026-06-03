@@ -16,3 +16,4 @@
 - No big architectural changes without a full rethink.
 - If it can be done on the client, do it there.
 - Favor brevity over "completeness."
+- Docs should point to working example scripts when they exist.

@@ -12,6 +12,8 @@ import { rmcmsAuth } from "/auth/rmcms-auth.js";
 const apiKey = await rmcmsAuth.getProperty("ai_config.json", "gemini_api_key");
 ```
 
+See `site/examples/auth_demo.html` for a complete working example.
+
 ## 2. The Secret Manager
 Use the built-in utility to encrypt new secrets:
 `http://localhost:8080/auth/manager.html`
