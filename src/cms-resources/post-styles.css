@@ -1,0 +1,116 @@
+body
+{
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: stretch;
+	font-family: 'CMU Serif';
+	min-height: 100%; /* Ensures full viewport height */
+	background-color: #ffffff; /* Light background color */
+}
+
+
+.hidden {
+	  display: none !important;
+}
+
+summary {
+	text-align: center;
+}
+
+
+.post 
+{
+	max-width: 950px; 
+	min-width: 50%;
+	height: 100%;
+	background-color: #ffffff; /* Light blue background for the container */
+	padding: 20px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); /* Optional shadow for depth */
+	overflow: hidden;
+}
+
+.post-text 
+{
+	text-align: left;
+	font-size: 1.2em;
+}
+
+.post-title 
+{
+	display: flex;
+	justify-content: center;
+	font-size: xx-large;
+	font-weight: bold;
+}
+
+.author-container 
+{
+	display: flex;
+	font-weight: bold;
+	justify-content: space-between;
+}
+
+.small-foldable-header 
+{
+	padding: 0.6em;
+	display: flex;
+	justify-content: center;	
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+.author, .date
+{
+	display: inline-block; /* Ensures both author and date are inline elements */
+}
+
+.picture 
+{
+    display: flex;
+    justify-content: center;
+	  padding: 1em;
+	  padding-top: 2em;
+	  padding-bottom: 2em;
+    align-items: center;
+	  max-width: 90%;
+	  margin: 0 auto;
+}
+
+.picture img 
+{
+    max-width: 100%; 
+    height: auto;    /* Maintain the aspect ratio */
+}
+
+img
+{
+  border:2px solid #eeeeee;
+}
+
+blockquote 
+{
+  border-left: 0.15em solid #444444;
+  padding-left: 0.6em;
+}
+
+table {
+  width: 100%; 
+  border-collapse: collapse; /* Merges cell borders for a cleaner look */
+  margin-bottom: 1em; 
+  margin-top: 1em; 
+  
+}
+
+th, td {
+  border: 1px solid #cccccc; 
+  padding: 8px;              
+  text-align: left;          
+}
+
+th {
+  background-color: #f2f2f2; 
+  font-weight: bold;         
+  color: #333;              
+}

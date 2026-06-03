@@ -1,4 +1,4 @@
-import { decryptRSA } from "../crypto-utils.js";
+import { decryptRSA } from "./crypto-utils.js";
 
 // Private module variables
 let sessionKey = null;
@@ -24,16 +24,13 @@ export const rmcmsAuth = {
     async unlock(privateKey, usernameHash) {
         sessionKey = privateKey;
         sessionUserHash = usernameHash;
-
         try {
             const db = await getDB();
             const tx = db.transaction(STORE_NAME, "readwrite");
             const store = tx.objectStore(STORE_NAME);
             store.put(privateKey, "privateKey");
             store.put(usernameHash, "usernameHash");
-        } catch (e) {
-            console.error("Persistence failed:", e);
-        }
+        } catch (e) { console.error("Persistence failed:", e); }
     },
 
     async tryRestoreSession() {
@@ -51,17 +48,13 @@ export const rmcmsAuth = {
                         sessionKey = keyReq.result;
                         sessionUserHash = hashReq.result;
                         resolve(true);
-                    } else {
-                        resolve(false);
-                    }
+                    } else { resolve(false); }
                 };
             });
         } catch (e) { return false; }
     },
 
-    isAuthenticated() {
-        return sessionKey !== null;
-    },
+    isAuthenticated() { return sessionKey !== null; },
 
     async getProperty(filename, propertyName) {
         if (!sessionKey) await this.tryRestoreSession();
@@ -71,11 +64,17 @@ export const rmcmsAuth = {
         }
 
         try {
-            const response = await fetch(`auth_data/${filename}`);
+            // Prepends the folder path as requested
+            const response = await fetch(`/auth/data_jsons/${filename}`);
+            if (!response.ok) throw new Error(`Secret file "${filename}" not found.`);
+            
             const data = await response.json();
             const userEntry = data.users[sessionUserHash];
-            if (!userEntry) throw new Error(`User entry missing.`);
+            if (!userEntry) throw new Error(`User entry missing in ${filename}.`);
+            
             const encryptedValue = userEntry[propertyName];
+            if (!encryptedValue) throw new Error(`Property "${propertyName}" missing.`);
+
             return await decryptRSA(encryptedValue, sessionKey);
         } catch (e) {
             alert(`Auth Error: ${e.message}`);
