@@ -8,7 +8,7 @@ function addStyles() {
 
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "/elements/elements.css";
+    link.href = "/elements/global.css";
     document.head.appendChild(link);
 
 }
