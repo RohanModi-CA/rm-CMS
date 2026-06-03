@@ -6,49 +6,11 @@ function addStyles() {
     if (stylesAdded) return;
     stylesAdded = true;
 
-    const style = document.createElement("style");
-    style.textContent = `
-        .rmcms-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            min-height: 34px;
-            padding: 6px 12px;
-            border-bottom: 1px solid black;
-            background: #fafafa;
-            font-family: monospace;
-            font-size: 14px;
-        }
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "/elements/elements.css";
+    document.head.appendChild(link);
 
-        .rmcms-header a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        .rmcms-header a:hover {
-            text-decoration: underline;
-        }
-
-        .rmcms-header-left,
-        .rmcms-header-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .rmcms-auth-indicator {
-            padding: 2px 8px;
-            border: 1px solid black;
-            border-radius: 999px;
-            white-space: nowrap;
-        }
-
-        .rmcms-auth-indicator[data-state="loading"] {
-            opacity: 0.7;
-        }
-    `;
-    document.head.appendChild(style);
 }
 
 function setAuthIndicator(link, authenticated) {
@@ -66,10 +28,10 @@ export function mountHeader(container, options = {}) {
     const homeLabel = options.homeLabel || "Home";
 
     const header = document.createElement("header");
-    header.className = "rmcms-header";
+    header.className = "rm-elements-header";
 
     const left = document.createElement("div");
-    left.className = "rmcms-header-left";
+    left.className = "rm-elements-header-left";
 
     const homeLink = document.createElement("a");
     homeLink.href = homeHref;
@@ -77,13 +39,13 @@ export function mountHeader(container, options = {}) {
     left.appendChild(homeLink);
 
     const right = document.createElement("div");
-    right.className = "rmcms-header-right";
+    right.className = "rm-elements-header-right";
 
     const authLink = document.createElement("a");
     authLink.href = loginHref;
     authLink.target = "_blank";
     authLink.rel = "noopener noreferrer";
-    authLink.className = "rmcms-auth-indicator";
+    authLink.className = "rm-elements-auth-indicator";
     authLink.dataset.state = "loading";
     authLink.textContent = "Checking...";
     right.appendChild(authLink);

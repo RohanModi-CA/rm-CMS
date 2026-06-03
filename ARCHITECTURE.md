@@ -5,6 +5,7 @@
 - **Zero Server:** The client is the engine. We avoid backend logic whenever possible.
 - **Trusted Scale:** Built for ~10 users. No over-engineering for edge cases, pen-testers, or old browsers.
 - **Pragmatic UX:** `alert()` is often the best error handler.
+- **Site-Wide Style:** Reusable elements and pages should follow the KaVimTeX / rohanmodi.ca post style.
 
 ## Components
 1. **Frontend:** Vanilla HTML/JS. Logic-heavy on the client.
