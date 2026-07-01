@@ -3,7 +3,7 @@
 ## Principles
 - **Simplicity Above All:** Code must be short and readable. If it doesn't fit in one mental schema, it's too complex.
 - **Zero Server:** The client is the engine. We avoid backend logic whenever possible.
-- **Trusted Scale:** Built for ~10 users. No over-engineering for edge cases, pen-testers, or old browsers.
+- **Trusted Scale:** Built for ~10 users. No over-engineering for edge cases or old browsers. Just 'engineering'.
 - **Pragmatic UX:** `alert()` is often the best error handler.
 - **Site-Wide Style:** Reusable elements and pages should follow the fonts and colors defined in `site/elements/global.css`.
 
