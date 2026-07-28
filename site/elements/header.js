@@ -23,7 +23,7 @@ export function mountHeader(container, options = {}) {
 
     addStyles();
 
-    const homeHref = options.homeHref || "/convert.html";
+    const homeHref = options.homeHref || "/index.html";
     const loginHref = options.loginHref || "/login.html";
     const homeLabel = options.homeLabel || "Home";
 
