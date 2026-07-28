@@ -1,0 +1,10 @@
+# Build artifacts and local storage
+src/uploads/
+src/cms-resources/images/
+
+# Authentication data (Personal secrets)
+site/auth/keys.json
+site/auth/data_jsons/
+
+# OS files
+.DS_Store

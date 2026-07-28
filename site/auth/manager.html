@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RM-CMS | Secret Manager</title>
+    <link rel="stylesheet" href="../convert.css">
+    <style>
+        .container { max-width: 600px; margin: 50px auto; padding: 20px; border: 1px solid black; display: flex; flex-direction: column; gap: 15px; }
+        select, input, textarea { padding: 8px; font-family: monospace; width: 100%; box-sizing: border-box; }
+        button { padding: 10px; cursor: pointer; font-family: monospace; background-color: #f0f0f0; }
+        #output { height: 150px; font-size: 11px; margin-top: 10px; background-color: #fafafa; }
+        .label { font-size: 12px; font-weight: bold; margin-bottom: -10px; }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="title"><h1>RM-CMS Secret Manager</h1></div>
+        <div class="container">
+            <div class="label">1. Target User</div>
+            <select id="user-select"><option>Loading users...</option></select>
+
+            <div class="label">2. Property Name (e.g., gemini_api_key)</div>
+            <input type="text" id="prop-name" placeholder="my_secret_name">
+
+            <div class="label">3. Secret Value (Plaintext)</div>
+            <textarea id="prop-value" placeholder="Paste your API key or secret here..."></textarea>
+
+            <button id="encrypt-btn">Encrypt & Generate JSON</button>
+
+            <div class="label">Result (Add this to your data file)</div>
+            <textarea id="output" readonly placeholder="JSON result will appear here..."></textarea>
+            
+            <p style="font-size: 12px; color: gray;">
+                Note: This tool uses the public key from keys.json. No login required to encrypt.
+            </p>
+            <hr>
+            <p style="text-align:center; font-size: 14px;"><a href="../login.html">Back to Login</a></p>
+        </div>
+    </div>
+    <script type="module" src="manager.js"></script>
+</body>
+</html>

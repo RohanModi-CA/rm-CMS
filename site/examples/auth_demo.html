@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Demo</title>
+</head>
+<body>
+    <h1>Secret Retrieval Demo</h1>
+    <button id="fetch-btn">Get Secret</button>
+    <p>Secret: <span id="output">...</span></p>
+
+    <script type="module">
+        // Absolute path from the site root
+        import { rmcmsAuth } from "/auth/rmcms-auth.js";
+
+        document.getElementById('fetch-btn').onclick = async () => {
+            try {
+                // To test this, you must have:
+                // 1. Logged in via login.html
+                // 2. Created site/auth_data/test.json with your hashed username
+                const val = await rmcmsAuth.getProperty("test.json", "my_secret");
+                document.getElementById('output').textContent = val;
+            } catch (e) {
+                console.error("Failed to fetch secret", e);
+                alert("Error: Check console. Are you logged in?");
+            }
+        };
+    </script>
+</body>
+</html>
